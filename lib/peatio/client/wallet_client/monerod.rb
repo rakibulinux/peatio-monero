@@ -11,8 +11,8 @@ module WalletClient
 
 
     def create_address!(options = {})
-      params = { label: options[:label], account_index: options[:account_index] }
-      params.merge!(account_index: options[:account_index]) unless options[:account_index].blank?
+      params = { label: options[:label] }
+      params.merge!(account_index: options[:account_index].to_i) unless options[:account_index].blank?
       result = json_rpc({method: 'create_address',params: params}).fetch('result')
       {
           address: normalize_address(result.fetch('address')),
