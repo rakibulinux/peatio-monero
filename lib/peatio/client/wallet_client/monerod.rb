@@ -31,13 +31,14 @@ module WalletClient
     end
 
     def create_withdrawal!(issuer, recipient, amount, options = {})
-      params = { destinations: [{ address: recipient[:address], amount: amount }] }
-      params.merge!(account_index: options[:account_index].to_i) unless options[:account_index].blank?
-      params.merge!(subaddr_indices: [options[:address_index].to_i]) unless options[:address_index].blank?
+      withdrawal_request(issuer, recipient, amount, options = {})
+        .fetch('tx_hash')
+        .yield_self { |txid| normalize_txid(txid) }
+    end
 
-      json_rpc({ method: 'transfer', params: params })
-          .fetch('result').fetch('tx_hash')
-          .yield_self { |txid| normalize_txid(txid) }
+    def get_txn_fee(issuer, recipient, amount, options = {})
+      withdrawal_request(issuer, recipient, amount, options = {})
+        .fetch('fee')
     end
 
     def inspect_address!(address)
@@ -74,6 +75,15 @@ module WalletClient
       response = JSON.parse(response.body)
       response['error'].tap { |error| raise Peatio::WalletClient::Error, error.inspect if error }
       response
+    end
+
+    def withdrawal_request(issuer, recipient, amount, options = {})
+      params = { destinations: [{ address: recipient[:address], amount: amount }] }
+      params.merge!(account_index: options[:account_index].to_i) unless options[:account_index].blank?
+      params.merge!(subaddr_indices: [options[:address_index].to_i]) unless options[:address_index].blank?
+      params.merge!(do_not_relay: true) if options[:do_not_relay].present?
+
+      json_rpc({ method: 'transfer', params: params }).fetch('result')
     end
   end
 end

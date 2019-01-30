@@ -82,6 +82,7 @@ module BlockchainClient
     memoize :connection
 
     def json_rpc(params = {})
+      puts "--params--#{params}"
       response = connection.post do |req|
         req.body = params.to_json
       end
@@ -94,7 +95,6 @@ module BlockchainClient
     def build_transfers(result)
       txns = []
       result.fetch("out", []).each do |out_txn|
-        next if out_txn["amount"] <= 0
         txns << out_txn.slice("height","fee","double_spend_seen","txid","destinations")
       end
       result.fetch("in", []).each do |in_txn|
