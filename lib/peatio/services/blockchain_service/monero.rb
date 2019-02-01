@@ -45,11 +45,11 @@ module BlockchainService
     private
 
     def deposit_wallet
-      @wallet ||= Wallet.deposit.find_by(currency: :xmr)
+      @deposit_wallet ||= Wallet.deposit.find_by(currency: :xmr)
     end
 
     def withdraw_wallet
-      @wallet ||= Wallet.withdraw.find_by(currency: :xmr)
+      @withdraw_wallet ||= Wallet.withdraw.find_by(currency: :xmr)
     end
 
     def build_deposits(txns)

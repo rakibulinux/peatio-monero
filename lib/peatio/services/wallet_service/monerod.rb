@@ -15,6 +15,8 @@ module WalletService
       spread_hash = spread_deposit(deposit)
       spread_hash.map do |address, amount|
 
+        amount *= deposit.currency.base_factor
+
         fee = client.get_txn_fee(
                 { address: pa.address, secret: pa.secret },
                 { address: address },
@@ -24,7 +26,6 @@ module WalletService
                   do_not_relay: true }
             )
 
-        amount *= deposit.currency.base_factor
         amount -= fee
 
         client.create_withdrawal!(
@@ -32,7 +33,8 @@ module WalletService
             { address: address },
             amount.to_i,
             { account_index: wallet.account_index,
-              address_index: pa.details["address_index"] }
+              address_index: pa.details["address_index"],
+              fee: fee }
         )
       end
     end

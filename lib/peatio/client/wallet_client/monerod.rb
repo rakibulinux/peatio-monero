@@ -82,6 +82,7 @@ module WalletClient
       params.merge!(account_index: options[:account_index].to_i) unless options[:account_index].blank?
       params.merge!(subaddr_indices: [options[:address_index].to_i]) unless options[:address_index].blank?
       params.merge!(do_not_relay: true) if options[:do_not_relay].present?
+      params.merge!(fee: options[:fee]) if options[:fee].present?
 
       json_rpc({ method: 'transfer', params: params }).fetch('result')
     end

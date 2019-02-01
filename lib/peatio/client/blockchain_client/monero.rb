@@ -82,7 +82,6 @@ module BlockchainClient
     memoize :connection
 
     def json_rpc(params = {})
-      puts "--params--#{params}"
       response = connection.post do |req|
         req.body = params.to_json
       end
